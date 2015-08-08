@@ -42,6 +42,7 @@ public class JsonKinesisDecoderModule
     public void configure(Binder binder)
     {
         bindRowDecoder(binder, JsonKinesisRowDecoder.class);
+        bindRowDecoder(binder, Base64ZLibJsonKinesisRowDecoder.class);
 
         bindFieldDecoder(binder, JsonKinesisFieldDecoder.class);
         bindFieldDecoder(binder, RFC2822JsonKinesisFieldDecoder.class);
