@@ -301,7 +301,14 @@
       </dependency>
     </dependencies>
 
-  <build>
+    <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>2.4</version>
+    </dependency>
+
+
+    <build>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
