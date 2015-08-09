@@ -43,8 +43,8 @@ public class JsonKinesisDecoderModule
     {
         bindRowDecoder(binder, JsonKinesisRowDecoder.class);
         bindRowDecoder(binder, Base64ZLibJsonKinesisRowDecoder.class);
-
         bindFieldDecoder(binder, JsonKinesisFieldDecoder.class);
+        bindFieldDecoder(binder, Base64ZLibJsonKinesisFieldDecoder.class);
         bindFieldDecoder(binder, RFC2822JsonKinesisFieldDecoder.class);
         // TODO: Implement other Json field decoders
         /*

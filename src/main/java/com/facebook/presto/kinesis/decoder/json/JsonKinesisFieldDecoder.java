@@ -13,19 +13,19 @@
  */
 package com.facebook.presto.kinesis.decoder.json;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static io.airlift.slice.Slices.EMPTY_SLICE;
-import static io.airlift.slice.Slices.utf8Slice;
-import static java.lang.String.format;
-import io.airlift.slice.Slice;
-
-import java.util.Set;
-
 import com.facebook.presto.kinesis.KinesisColumnHandle;
 import com.facebook.presto.kinesis.KinesisFieldValueProvider;
 import com.facebook.presto.kinesis.decoder.KinesisFieldDecoder;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.ImmutableSet;
+import io.airlift.slice.Slice;
+
+import java.util.Set;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static io.airlift.slice.Slices.EMPTY_SLICE;
+import static io.airlift.slice.Slices.utf8Slice;
+import static java.lang.String.format;
 
 public class JsonKinesisFieldDecoder
         implements KinesisFieldDecoder<JsonNode>
@@ -37,7 +37,7 @@ public class JsonKinesisFieldDecoder
     }
 
     @Override
-    public final String getRowDecoderName()
+    public  String getRowDecoderName()
     {
         return JsonKinesisRowDecoder.NAME;
     }
@@ -62,6 +62,8 @@ public class JsonKinesisFieldDecoder
     {
         return format("FieldDecoder[%s/%s]", getRowDecoderName(), getFieldDecoderName());
     }
+
+
 
     public static class JsonKinesisValueProvider
             extends KinesisFieldValueProvider
