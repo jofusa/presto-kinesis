@@ -58,18 +58,16 @@ public class Base64ZLibJsonKinesisRowDecoder
     {
         JsonNode tree;
 
-        String decoded_data = null;
+        String decodedData = null;
         try {
-            decoded_data = new String(decodeAndUncompress(data), "UTF-8");
-        } catch (IOException e) {
+            decodedData = new String(decodeAndUncompress(data), "UTF-8");
+        }
+        catch (IOException e) {
             e.printStackTrace();
         }
 
-
-
-
         try {
-            tree = objectMapper.readTree(decoded_data);
+            tree = objectMapper.readTree(decodedData);
         }
         catch (Exception e) {
             return false;
@@ -105,18 +103,16 @@ public class Base64ZLibJsonKinesisRowDecoder
         return currentNode;
     }
 
-
     /**
      * Decodes and decompressed a string of information that's encoded via base 64 and compressed via zlib
      */
-    public static byte[] decodeAndUncompress(byte[] data) throws IOException {
-
-        String string_data = new String(data,"UTF-8");
+    public static byte[] decodeAndUncompress(byte[] data) throws IOException
+    {
+        String stringData = new String(data, "UTF-8");
         BaseEncoding decoder = BaseEncoding.base64().withSeparator("\n", 1);
-        ByteArrayInputStream compressed = new ByteArrayInputStream(decoder.decode(string_data));
+        ByteArrayInputStream compressed = new ByteArrayInputStream(decoder.decode(stringData));
         InflaterInputStream decompressed = new InflaterInputStream(compressed);
 
         return ByteStreams.toByteArray(decompressed);
     }
-
 }

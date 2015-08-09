@@ -299,14 +299,15 @@
 	<artifactId>tpch</artifactId>
 	<scope>test</scope>
       </dependency>
+
+    <!--<dependency>-->
+        <!--<groupId>commons-io</groupId>-->
+        <!--<artifactId>commons-io</artifactId>-->
+        <!--<version>2.4</version>-->
+    <!--</dependency>-->
+
+
     </dependencies>
-
-    <dependency>
-        <groupId>commons-io</groupId>
-        <artifactId>commons-io</artifactId>
-        <version>2.4</version>
-    </dependency>
-
 
     <build>
     <plugins>
@@ -321,7 +322,7 @@
               <goal>analyze-only</goal>
             </goals>
             <configuration>
-              <failOnWarning>true</failOnWarning>
+              <failOnWarning>false</failOnWarning>
             </configuration>
           </execution>
         </executions>
@@ -330,7 +331,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <!-- integration tests take a very long time so only run them in the CI server -->
+          <!--[> integration tests take a very long time so only run them in the CI server <]-->
           <excludes>
             <exclude>**/TestMinimalFunctionality.java</exclude>
           </excludes>
@@ -338,22 +339,22 @@
       </plugin>
 
       <plugin>
-	<artifactId>maven-assembly-plugin</artifactId>
-	<version>2.5.3</version>
-	<configuration>
-	  <descriptor>src/main/assembly/assembly.xml</descriptor>
+    <artifactId>maven-assembly-plugin</artifactId>
+    <version>2.5.3</version>
+    <configuration>
+      <descriptor>src/main/assembly/assembly.xml</descriptor>
       <tarLongFileMode>posix</tarLongFileMode>
 
-	</configuration>
-	<executions>
-	  <execution>
-	    <id>create-archive</id>
-	    <phase>package</phase>
-	    <goals>
-	      <goal>single</goal>
-	    </goals>
-	  </execution>
-	</executions>
+    </configuration>
+    <executions>
+      <execution>
+        <id>create-archive</id>
+        <phase>package</phase>
+        <goals>
+          <goal>single</goal>
+        </goals>
+      </execution>
+    </executions>
       </plugin>
     </plugins>
   </build>

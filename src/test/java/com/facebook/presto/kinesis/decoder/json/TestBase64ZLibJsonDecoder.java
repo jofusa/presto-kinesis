@@ -52,13 +52,9 @@ public class TestBase64ZLibJsonDecoder
     public void testSimple()
             throws Exception
     {
-        byte[] raw_data = ByteStreams.toByteArray(TestBase64ZLibJsonDecoder.class.getResourceAsStream("/decoder/json/base64_zlib_message.data"));
+        byte[] rawData = ByteStreams.toByteArray(TestBase64ZLibJsonDecoder.class.getResourceAsStream("/decoder/json/base64_zlib_message.data"));
 
         Base64ZLibJsonKinesisRowDecoder rowDecoder = new Base64ZLibJsonKinesisRowDecoder(PROVIDER.get());
-
-
-        byte[] decompressed_data = rowDecoder.decodeAndUncompress(raw_data);
-        String string_data = new String(decompressed_data, "UTF-8");
 
         KinesisColumnHandle row1 = new KinesisColumnHandle("", 0, "row1", VarcharType.VARCHAR, "source", null, null, false, false);
         KinesisColumnHandle row2 = new KinesisColumnHandle("", 1, "row2", VarcharType.VARCHAR, "user/screen_name", null, null, false, false);
@@ -69,7 +65,7 @@ public class TestBase64ZLibJsonDecoder
         List<KinesisColumnHandle> columns = ImmutableList.of(row1, row2, row3, row4, row5);
         Set<KinesisFieldValueProvider> providers = new HashSet<>();
 
-        boolean valid = rowDecoder.decodeRow(raw_data, providers, columns, buildMap(columns));
+        boolean valid = rowDecoder.decodeRow(rawData, providers, columns, buildMap(columns));
         assertTrue(valid);
 
         assertEquals(providers.size(), columns.size());
