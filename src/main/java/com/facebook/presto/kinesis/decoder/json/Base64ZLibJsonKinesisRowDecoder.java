@@ -16,9 +16,14 @@ package com.facebook.presto.kinesis.decoder.json;
 import com.facebook.presto.kinesis.KinesisColumnHandle;
 import com.facebook.presto.kinesis.KinesisFieldValueProvider;
 import com.facebook.presto.kinesis.decoder.KinesisFieldDecoder;
+import com.facebook.presto.kinesis.decoder.KinesisRowDecoder;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.MissingNode;
+import com.google.common.base.Splitter;
 import com.google.common.io.BaseEncoding;
 import com.google.common.io.ByteStreams;
+import com.google.inject.Inject;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -27,20 +32,32 @@ import java.util.Map;
 import java.util.Set;
 import java.util.zip.InflaterInputStream;
 
+import static com.google.common.base.Preconditions.checkState;
+
 public class Base64ZLibJsonKinesisRowDecoder
-        extends JsonKinesisRowDecoder
+        implements KinesisRowDecoder
 {
     public static final String NAME = "base64-zlib-json";
+    private final ObjectMapper objectMapper;
 
-    public Base64ZLibJsonKinesisRowDecoder(ObjectMapper objectMapper) {
-        super(objectMapper);
+    @Inject
+    public Base64ZLibJsonKinesisRowDecoder(ObjectMapper objectMapper)
+    {
+        this.objectMapper = objectMapper;
+    }
+
+    @Override
+    public String getName()
+    {
+        return NAME;
     }
 
     @Override
     public boolean decodeRow(byte[] data, Set<KinesisFieldValueProvider> fieldValueProviders, List<KinesisColumnHandle> columnHandles, Map<KinesisColumnHandle, KinesisFieldDecoder<?>> fieldDecoders)
     {
-        // convert data from a base64'd zlib format to json
         byte[] decodedData;
+        JsonNode tree;
+
         try {
             decodedData = decodeAndUncompress(data);
         }
@@ -48,7 +65,42 @@ public class Base64ZLibJsonKinesisRowDecoder
             e.printStackTrace();
             return false;
         }
-        return super.decodeRow(decodedData, fieldValueProviders, columnHandles, fieldDecoders);
+
+        try {
+            tree = objectMapper.readTree(decodedData);
+        }
+        catch (Exception e) {
+            return false;
+        }
+
+        for (KinesisColumnHandle columnHandle : columnHandles) {
+            if (columnHandle.isInternal()) {
+                continue;
+            }
+            @SuppressWarnings("unchecked")
+            KinesisFieldDecoder<JsonNode> decoder = (KinesisFieldDecoder<JsonNode>) fieldDecoders.get(columnHandle);
+
+            if (decoder != null) {
+                JsonNode node = locateNode(tree, columnHandle);
+                fieldValueProviders.add(decoder.decode(node, columnHandle));
+            }
+        }
+        return true;
+    }
+
+    private static JsonNode locateNode(JsonNode tree, KinesisColumnHandle columnHandle)
+    {
+        String mapping = columnHandle.getMapping();
+        checkState(mapping != null, "No mapping for %s", columnHandle.getName());
+
+        JsonNode currentNode = tree;
+        for (String pathElement : Splitter.on('/').omitEmptyStrings().split(mapping)) {
+            if (!currentNode.has(pathElement)) {
+                return MissingNode.getInstance();
+            }
+            currentNode = currentNode.path(pathElement);
+        }
+        return currentNode;
     }
 
     /**
