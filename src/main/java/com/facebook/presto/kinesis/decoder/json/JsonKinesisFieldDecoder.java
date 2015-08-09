@@ -63,8 +63,6 @@ public class JsonKinesisFieldDecoder
         return format("FieldDecoder[%s/%s]", getRowDecoderName(), getFieldDecoderName());
     }
 
-
-
     public static class JsonKinesisValueProvider
             extends KinesisFieldValueProvider
     {
